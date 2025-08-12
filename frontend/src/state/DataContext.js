@@ -5,10 +5,11 @@ const DataContext = createContext();
 export function DataProvider({ children }) {
   const [items, setItems] = useState([]);
 
-  const fetchItems = useCallback(async () => {
-    const res = await fetch('http://localhost:3001/api/items?limit=500'); // Intentional bug: backend ignores limit
-    const json = await res.json();
-    setItems(json);
+  const fetchItems = useCallback(async ({ page = 1, limit = 10, q = '' } = {}, signal) => {
+    const params = new URLSearchParams({ page, limit, q });
+    const res = await fetch(`/api/items?${params.toString()}`, { signal });
+    if (!res.ok) throw new Error('Failed to fetch items');
+    return res.json();
   }, []);
 
   return (

@@ -1,0 +1,102 @@
+.items-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.4rem;
+  font-size: 1rem;
+}
+.search-input:focus {
+  outline: 2px solid #007bff;
+  border-color: #007bff;
+}
+
+.items-list {
+  border: 1px solid #ddd;
+  border-radius: 0.4rem;
+  background: white;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+.item-row:hover {
+  background: #f8f9fa;
+}
+.item-link {
+  text-decoration: none;
+  color: #007bff;
+}
+.item-link:hover {
+  text-decoration: underline;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.btn {
+  padding: 0.4rem 0.75rem;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+.btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Skeleton loader */
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+}
+.skeleton-bar {
+  height: 12px;
+  width: 60%;
+  background: linear-gradient(90deg, #eee, #ddd, #eee);
+  border-radius: 4px;
+  animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer {
+  0% { background-position: -100px; }
+  100% { background-position: 200px; }
+}
+.skeleton-bar {
+  background-size: 200% 100%;
+}
+
+/* Accessibility */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+}

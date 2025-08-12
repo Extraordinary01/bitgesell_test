@@ -2,11 +2,15 @@
   "name": "frontend",
   "version": "2.0.0",
   "private": true,
+  "type": "commonjs",
   "dependencies": {
+    "joi": "^18.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.23.0",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "react-window": "^1.8.11",
+    "supertest": "^7.1.4"
   },
   "scripts": {
     "start": "cross-env PORT=3000 react-scripts start",
@@ -26,6 +30,29 @@
     ]
   },
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.3.0",
+    "cross-env": "^7.0.3",
+    "cross-fetch": "^4.1.0",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
+    "jest-fetch-mock": "^3.0.3",
+    "msw": "^2.10.4",
+    "node-fetch": "^3.3.2"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.js"
+    ],
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!your-esm-dep-name)"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    }
   }
 }

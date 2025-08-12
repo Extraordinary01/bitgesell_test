@@ -1,46 +1,63 @@
 const express = require('express');
-const fs = require('fs');
+const fs = require('fs/promises');
 const path = require('path');
+const Joi = require('joi');
+
 const router = express.Router();
 const DATA_PATH = path.join(__dirname, '../../../data/items.json');
 
-// Utility to read data (intentionally sync to highlight blocking issue)
-function readData() {
-  const raw = fs.readFileSync(DATA_PATH);
+// Joi schema for an item (without id, which we assign)
+const itemSchema = Joi.object({
+  name: Joi.string().min(1).required(),
+  price: Joi.number().positive().required()
+});
+
+// Utility to read data
+async function readData() {
+  const raw = await fs.readFile(DATA_PATH, 'utf-8');
   return JSON.parse(raw);
 }
 
 // GET /api/items
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
-    const data = readData();
-    const { limit, q } = req.query;
+    const data = await readData();
+    const { limit = 10, page = 1, q } = req.query;
     let results = data;
 
+    // Search filter
     if (q) {
-      // Simple substring search (sub‑optimal)
-      results = results.filter(item => item.name.toLowerCase().includes(q.toLowerCase()));
+      results = results.filter(item =>
+        item.name.toLowerCase().includes(q.toLowerCase())
+      );
     }
 
-    if (limit) {
-      results = results.slice(0, parseInt(limit));
-    }
+    const total = results.length;
+    const perPage = parseInt(limit, 10);
+    const currentPage = parseInt(page, 10);
 
-    res.json(results);
+    // Pagination slice
+    const start = (currentPage - 1) * perPage;
+    const paginated = results.slice(start, start + perPage);
+
+    res.json({
+      total,
+      page: currentPage,
+      limit: perPage,
+      items: paginated
+    });
   } catch (err) {
     next(err);
   }
 });
 
 // GET /api/items/:id
-router.get('/:id', (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   try {
-    const data = readData();
-    const item = data.find(i => i.id === parseInt(req.params.id));
+    const data = await readData();
+    const item = data.find(i => i.id === parseInt(req.params.id, 10));
     if (!item) {
-      const err = new Error('Item not found');
-      err.status = 404;
-      throw err;
+      res.status(404).send({'error': 'Item not found'})
     }
     res.json(item);
   } catch (err) {
@@ -49,15 +66,17 @@ router.get('/:id', (req, res, next) => {
 });
 
 // POST /api/items
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
-    // TODO: Validate payload (intentional omission)
-    const item = req.body;
-    const data = readData();
-    item.id = Date.now();
-    data.push(item);
-    fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2));
-    res.status(201).json(item);
+    const { error, value } = itemSchema.validate(req.body);
+    if (error) {
+      res.status(400).send({'error': `Validation error: ${error.details[0].message}`})
+    }
+    const data = await readData();
+    const newItem = { id: Date.now(), ...value };
+    data.push(newItem);
+    await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2));
+    res.status(201).json(newItem);
   } catch (err) {
     next(err);
   }
